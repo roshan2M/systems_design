@@ -1,0 +1,11 @@
+# Build artifacts
+build/
+*.o
+*.out
+*.dSYM/
+
+# Editor / language server caches
+.cache/
+
+# macOS metadata
+.DS_Store

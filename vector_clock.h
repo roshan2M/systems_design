@@ -7,7 +7,7 @@
 #include <string>
 
 // ============================================================================
-// Educational Vector Clock (Causal Ordering & Conflict Detection)
+// Vector Clock (Causal Ordering & Conflict Detection)
 // ============================================================================
 //
 // In leaderless/multi-leader systems (Dynamo, Riak), physical wall clocks
@@ -111,4 +111,3 @@ public:
 private:
   std::map<std::string, std::uint64_t> clocks_;
 };
-

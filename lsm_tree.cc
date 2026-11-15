@@ -15,7 +15,7 @@
 #include <vector>
 
 // ============================================================================
-// Educational Log-Structured Merge (LSM) Tree
+// Log-Structured Merge (LSM) Tree
 // ============================================================================
 //
 // An LSM tree optimizes for high write throughput by turning random writes

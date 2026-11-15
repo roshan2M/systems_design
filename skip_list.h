@@ -9,7 +9,7 @@
 #include <utility>
 
 // ============================================================================
-// Educational Skip List (Ordered Key-Value Map)
+// Skip List (Ordered Key-Value Map)
 // ============================================================================
 //
 // A Skip List is a probabilistic alternative to balanced trees (Red-Black /
@@ -58,7 +58,8 @@ private:
     using iterator_category = std::forward_iterator_tag;
     using difference_type = std::ptrdiff_t;
     using value_type = SkipList::value_type;
-    using pointer = std::conditional_t<IsConst, const value_type *, value_type *>;
+    using pointer =
+        std::conditional_t<IsConst, const value_type *, value_type *>;
     using reference =
         std::conditional_t<IsConst, const value_type &, value_type &>;
     using NodePtr = std::conditional_t<IsConst, const Node *, Node *>;
@@ -98,7 +99,8 @@ public:
   using iterator = Iter<false>;
   using const_iterator = Iter<true>;
 
-  SkipList() : head_(new Node(K{}, V{}, kMaxLevel)), rng_(std::random_device{}()) {}
+  SkipList()
+      : head_(new Node(K{}, V{}, kMaxLevel)), rng_(std::random_device{}()) {}
 
   ~SkipList() {
     clear();
@@ -285,4 +287,3 @@ private:
     return nullptr;
   }
 };
-

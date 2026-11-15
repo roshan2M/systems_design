@@ -9,7 +9,7 @@
 #include <vector>
 
 // ============================================================================
-// Educational Merkle Tree (Anti-Entropy Replica Sync)
+// Merkle Tree (Anti-Entropy Replica Sync)
 // ============================================================================
 //
 // In distributed databases (Dynamo, Cassandra, Riak), two replicas holding
@@ -113,8 +113,7 @@ private:
   }
 
   static void diff_nodes(const Node *a, const Node *b,
-                         std::vector<std::string> &out,
-                         std::size_t &compared) {
+                         std::vector<std::string> &out, std::size_t &compared) {
     if (a == nullptr && b == nullptr) {
       return;
     }
@@ -152,4 +151,3 @@ private:
     collect_leaves(node->right.get(), out);
   }
 };
-

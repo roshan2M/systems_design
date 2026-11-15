@@ -10,7 +10,7 @@
 #include <vector>
 
 // ============================================================================
-// Educational Bloom Filter
+// Bloom Filter
 // ============================================================================
 //
 // A Bloom filter is a space-efficient, probabilistic set membership structure:

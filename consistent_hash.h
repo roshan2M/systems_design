@@ -11,12 +11,12 @@
 #include <vector>
 
 // ============================================================================
-// Educational Consistent Hashing Ring (with Virtual Nodes)
+// Consistent Hashing Ring (with Virtual Nodes)
 // ============================================================================
 //
 // Naive sharding (`hash(key) % N`) remaps almost every key (~(N-1)/N) when a
-// server is added or removed. Consistent hashing maps both servers and keys onto
-// the same circular hash space [0, 2^64):
+// server is added or removed. Consistent hashing maps both servers and keys
+// onto the same circular hash space [0, 2^64):
 //
 //                     0 (wraps around)
 //                    ...
@@ -51,7 +51,8 @@ public:
 
     for (std::size_t i = 0; i < vnodes_per_node_; ++i) {
       std::size_t h = hash_vnode(node, i);
-      // Probe linearly in the rare event of an exact hash collision on the ring.
+      // Probe linearly in the rare event of an exact hash collision on the
+      // ring.
       while (ring_.contains(h)) {
         ++h;
       }
@@ -86,18 +87,20 @@ public:
 
   // Returns up to `replication_factor` distinct physical nodes walking
   // clockwise from `hash(key)` (Dynamo / Cassandra preference list).
-  std::vector<std::string> get_preference_list(std::string_view key,
-                                               std::size_t replication_factor) const {
+  std::vector<std::string>
+  get_preference_list(std::string_view key,
+                      std::size_t replication_factor) const {
     std::vector<std::string> replicas;
     if (ring_.empty() || replication_factor == 0) {
       return replicas;
     }
-    const std::size_t target = std::min(replication_factor, node_hashes_.size());
+    const std::size_t target =
+        std::min(replication_factor, node_hashes_.size());
     std::set<std::string_view> seen;
 
     auto it = ring_.lower_bound(hash_key(key));
-    for (std::size_t steps = 0; steps < ring_.size() && replicas.size() < target;
-         ++steps) {
+    for (std::size_t steps = 0;
+         steps < ring_.size() && replicas.size() < target; ++steps) {
       if (it == ring_.end()) {
         it = ring_.begin();
       }
@@ -121,8 +124,8 @@ private:
     return std::hash<std::string_view>{}(key);
   }
 
-  static std::size_t hash_vnode(const std::string &node, std::size_t vnode_idx) {
+  static std::size_t hash_vnode(const std::string &node,
+                                std::size_t vnode_idx) {
     return std::hash<std::string>{}(node + "#" + std::to_string(vnode_idx));
   }
 };
-

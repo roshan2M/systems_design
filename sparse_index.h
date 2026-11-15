@@ -10,12 +10,13 @@
 #include <vector>
 
 // ============================================================================
-// Educational Sparse Index (for Sorted SSTable Files)
+// Sparse Index (for Sorted SSTable Files)
 // ============================================================================
 //
 // Because an SSTable file on disk is immutable and sorted by key, we do NOT
 // need an in-memory entry for every single key (a "dense" index). Instead, we
-// keep a "sparse" index storing the byte offset of every N-th key (1 per block):
+// keep a "sparse" index storing the byte offset of every N-th key (1 per
+// block):
 //
 //   Sparse Index (RAM)               Sorted SSTable File (Disk)
 //   ┌─────────┬────────┐             ┌──────────────────────────┐
@@ -66,11 +67,11 @@ public:
       return std::nullopt;
     }
 
-    auto upper = std::upper_bound(
-        entries_.begin(), entries_.end(), key,
-        [](std::string_view target, const IndexEntry &entry) {
-          return target < entry.key;
-        });
+    auto upper =
+        std::upper_bound(entries_.begin(), entries_.end(), key,
+                         [](std::string_view target, const IndexEntry &entry) {
+                           return target < entry.key;
+                         });
 
     auto block_it = std::prev(upper);
     std::optional<std::streamoff> end_offset = std::nullopt;
@@ -95,4 +96,3 @@ private:
   std::vector<IndexEntry> entries_;
   std::string max_key_;
 };
-

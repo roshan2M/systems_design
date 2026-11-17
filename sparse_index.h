@@ -40,10 +40,10 @@
 // ============================================================================
 
 class SparseIndex {
-public:
+ public:
   struct BlockRange {
     std::streamoff start_offset;
-    std::optional<std::streamoff> end_offset; // nullopt = last block until EOF
+    std::optional<std::streamoff> end_offset;  // nullopt = last block until EOF
   };
 
   explicit SparseIndex(std::size_t stride = 16)
@@ -69,7 +69,7 @@ public:
 
     auto upper =
         std::upper_bound(entries_.begin(), entries_.end(), key,
-                         [](std::string_view target, const IndexEntry &entry) {
+                         [](std::string_view target, const IndexEntry& entry) {
                            return target < entry.key;
                          });
 
@@ -85,7 +85,7 @@ public:
   std::size_t total_records() const { return record_count_; }
   std::size_t stride() const { return stride_; }
 
-private:
+ private:
   struct IndexEntry {
     std::string key;
     std::streamoff offset;

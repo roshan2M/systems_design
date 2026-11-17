@@ -26,7 +26,7 @@
 // ============================================================================
 
 class BloomFilter {
-public:
+ public:
   // Construct explicitly with `num_bits` (m) and `num_hashes` (k).
   explicit BloomFilter(std::size_t num_bits = 1024, std::size_t num_hashes = 7)
       : bits_(std::max<std::size_t>(1, num_bits), false),
@@ -59,17 +59,17 @@ public:
     const auto [h1, h2] = hash_pair(key);
     for (std::size_t i = 0; i < num_hashes_; ++i) {
       if (!bits_[nth_bit(h1, h2, i)]) {
-        return false; // Definitely not present
+        return false;  // Definitely not present
       }
     }
-    return true; // Probably present
+    return true;  // Probably present
   }
 
   std::size_t num_bits() const { return bits_.size(); }
   std::size_t num_hashes() const { return num_hashes_; }
 
-private:
-  std::vector<bool> bits_; // Compact bitset (1 bit per element)
+ private:
+  std::vector<bool> bits_;  // Compact bitset (1 bit per element)
   std::size_t num_hashes_;
 
   // Kirsch-Mitzenmacher double hashing (used by RocksDB / LevelDB):
@@ -89,8 +89,7 @@ private:
     std::hash<std::string> hasher;
     std::size_t h1 = hasher("1:" + std::string(key));
     std::size_t h2 = hasher("2:" + std::string(key));
-    if (h2 == 0)
-      h2 = 1; // Avoid step size of 0
+    if (h2 == 0) h2 = 1;  // Avoid step size of 0
     return {h1, h2};
   }
 };

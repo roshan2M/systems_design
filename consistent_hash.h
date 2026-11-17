@@ -38,11 +38,11 @@
 // ============================================================================
 
 class ConsistentHashRing {
-public:
+ public:
   explicit ConsistentHashRing(std::size_t vnodes_per_node = 150)
       : vnodes_per_node_(std::max<std::size_t>(1, vnodes_per_node)) {}
 
-  void add_node(const std::string &node) {
+  void add_node(const std::string& node) {
     if (node_hashes_.contains(node)) {
       return;
     }
@@ -62,7 +62,7 @@ public:
     node_hashes_.emplace(node, std::move(positions));
   }
 
-  void remove_node(const std::string &node) {
+  void remove_node(const std::string& node) {
     auto it = node_hashes_.find(node);
     if (it == node_hashes_.end()) {
       return;
@@ -80,16 +80,15 @@ public:
     }
     auto it = ring_.lower_bound(hash_key(key));
     if (it == ring_.end()) {
-      it = ring_.begin(); // Wrap around the ring
+      it = ring_.begin();  // Wrap around the ring
     }
     return it->second;
   }
 
   // Returns up to `replication_factor` distinct physical nodes walking
   // clockwise from `hash(key)` (Dynamo / Cassandra preference list).
-  std::vector<std::string>
-  get_preference_list(std::string_view key,
-                      std::size_t replication_factor) const {
+  std::vector<std::string> get_preference_list(
+      std::string_view key, std::size_t replication_factor) const {
     std::vector<std::string> replicas;
     if (ring_.empty() || replication_factor == 0) {
       return replicas;
@@ -115,7 +114,7 @@ public:
   std::size_t node_count() const { return node_hashes_.size(); }
   std::size_t vnode_count() const { return ring_.size(); }
 
-private:
+ private:
   std::size_t vnodes_per_node_;
   std::map<std::size_t, std::string> ring_;
   std::unordered_map<std::string, std::vector<std::size_t>> node_hashes_;
@@ -124,7 +123,7 @@ private:
     return std::hash<std::string_view>{}(key);
   }
 
-  static std::size_t hash_vnode(const std::string &node,
+  static std::size_t hash_vnode(const std::string& node,
                                 std::size_t vnode_idx) {
     return std::hash<std::string>{}(node + "#" + std::to_string(vnode_idx));
   }

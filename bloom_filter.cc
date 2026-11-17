@@ -10,7 +10,7 @@
 // ============================================================================
 int main() {
   constexpr std::size_t N = 10'000;
-  constexpr double TARGET_FPR = 0.01; // 1% target false positive rate
+  constexpr double TARGET_FPR = 0.01;  // 1% target false positive rate
 
   auto filter = BloomFilter::with_rate(N, TARGET_FPR);
 
@@ -50,6 +50,6 @@ int main() {
             << "  -> In an LSM tree, " << (QUERIES - false_positives) << " / "
             << QUERIES << " pointless SSTable disk reads were skipped!\n";
 
-  assert(actual_fpr < 2.0); // Sanity check near 1%
+  assert(actual_fpr < 2.0);  // Sanity check near 1%
   return 0;
 }

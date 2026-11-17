@@ -18,16 +18,15 @@ static std::string make_key(int i) {
 }
 
 // Seek straight to `range.start_offset` and scan at most one block on disk.
-static std::optional<std::string>
-lookup_in_block(const std::filesystem::path &sst_path,
-                const SparseIndex::BlockRange &range,
-                const std::string &target_key, std::size_t &records_scanned) {
+static std::optional<std::string> lookup_in_block(
+    const std::filesystem::path& sst_path, const SparseIndex::BlockRange& range,
+    const std::string& target_key, std::size_t& records_scanned) {
   std::ifstream in(sst_path, std::ios::binary);
   in.seekg(range.start_offset);
 
   while ((in >> std::ws) && in.peek() != std::char_traits<char>::eof()) {
     if (range.end_offset && in.tellg() >= *range.end_offset) {
-      break; // Reached start of the next block
+      break;  // Reached start of the next block
     }
     char present;
     std::string key, value;
@@ -40,7 +39,7 @@ lookup_in_block(const std::filesystem::path &sst_path,
                               : std::nullopt;
     }
     if (key > target_key) {
-      break; // Sorted SSTable: target_key cannot appear past here
+      break;  // Sorted SSTable: target_key cannot appear past here
     }
   }
   return std::nullopt;
@@ -52,11 +51,12 @@ lookup_in_block(const std::filesystem::path &sst_path,
 int main() {
   const std::filesystem::path sst_path = "/tmp/sparse_index_demo.sst";
   constexpr int N = 1'000;
-  constexpr std::size_t STRIDE = 16; // 1 index entry per 16 records on disk
+  constexpr std::size_t STRIDE = 16;  // 1 index entry per 16 records on disk
 
   SparseIndex index(STRIDE);
 
-  // 1. Write 1,000 sorted keys (even numbers: key_0000, key_0002, ..., key_1998)
+  // 1. Write 1,000 sorted keys (even numbers: key_0000, key_0002, ...,
+  // key_1998)
   //    and record every 16th key's byte offset in the SparseIndex.
   {
     std::ofstream out(sst_path, std::ios::binary);
@@ -92,7 +92,7 @@ int main() {
 
     std::size_t scanned = 0;
     auto found = lookup_in_block(sst_path, *range, key, scanned);
-    assert(scanned <= STRIDE); // Never scans more than 1 block!
+    assert(scanned <= STRIDE);  // Never scans more than 1 block!
 
     if (k % 2 == 0) {
       assert(found == "val_" + std::to_string(k));
@@ -112,4 +112,3 @@ int main() {
   std::filesystem::remove(sst_path);
   return 0;
 }
-

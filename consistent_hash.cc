@@ -8,12 +8,12 @@
 #include <string>
 #include <vector>
 
-static void print_distribution(const ConsistentHashRing &ring, int num_keys) {
+static void print_distribution(const ConsistentHashRing& ring, int num_keys) {
   std::map<std::string, int> counts;
   for (int i = 0; i < num_keys; ++i) {
     counts[ring.get_node("key_" + std::to_string(i))]++;
   }
-  for (const auto &[node, count] : counts) {
+  for (const auto& [node, count] : counts) {
     const double pct = 100.0 * count / num_keys;
     std::cout << "    " << node << ": " << std::setw(5) << count << " keys ("
               << std::fixed << std::setprecision(1) << pct << "%)\n";
@@ -30,7 +30,7 @@ int main() {
   // 1. Compare load balance: 1 vnode per node vs 150 vnodes per node.
   ConsistentHashRing no_vnodes(/*vnodes_per_node=*/1);
   ConsistentHashRing with_vnodes(/*vnodes_per_node=*/150);
-  for (const auto &n : initial_nodes) {
+  for (const auto& n : initial_nodes) {
     no_vnodes.add_node(n);
     with_vnodes.add_node(n);
   }

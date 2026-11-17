@@ -32,14 +32,14 @@
 // ============================================================================
 
 class MerkleTree {
-public:
-  explicit MerkleTree(const std::map<std::string, std::string> &data) {
+ public:
+  explicit MerkleTree(const std::map<std::string, std::string>& data) {
     if (data.empty()) {
       return;
     }
     std::vector<std::unique_ptr<Node>> level;
     level.reserve(data.size());
-    for (const auto &[k, v] : data) {
+    for (const auto& [k, v] : data) {
       level.push_back(std::make_unique<Node>(Node{
           .hash = hash_leaf(k, v),
           .key = k,
@@ -78,8 +78,8 @@ public:
   // Returns the sorted list of keys that differ between `this` and `other`
   // (assuming both trees were built over the same key set), and records how
   // many tree nodes were compared.
-  std::vector<std::string> diff(const MerkleTree &other,
-                                std::size_t *nodes_compared = nullptr) const {
+  std::vector<std::string> diff(const MerkleTree& other,
+                                std::size_t* nodes_compared = nullptr) const {
     std::vector<std::string> differing_keys;
     std::size_t compared = 0;
     diff_nodes(root_.get(), other.root_.get(), differing_keys, compared);
@@ -89,10 +89,10 @@ public:
     return differing_keys;
   }
 
-private:
+ private:
   struct Node {
     std::size_t hash;
-    std::string key; // Non-empty only for leaf nodes
+    std::string key;  // Non-empty only for leaf nodes
     std::unique_ptr<Node> left;
     std::unique_ptr<Node> right;
 
@@ -101,8 +101,8 @@ private:
 
   std::unique_ptr<Node> root_;
 
-  static std::size_t hash_leaf(const std::string &key,
-                               const std::string &value) {
+  static std::size_t hash_leaf(const std::string& key,
+                               const std::string& value) {
     return std::hash<std::string>{}("L:" + key + '\0' + value);
   }
 
@@ -112,8 +112,8 @@ private:
                                     std::to_string(right_hash));
   }
 
-  static void diff_nodes(const Node *a, const Node *b,
-                         std::vector<std::string> &out, std::size_t &compared) {
+  static void diff_nodes(const Node* a, const Node* b,
+                         std::vector<std::string>& out, std::size_t& compared) {
     if (a == nullptr && b == nullptr) {
       return;
     }
@@ -124,7 +124,7 @@ private:
       return;
     }
     if (a->hash == b->hash) {
-      return; // Entire subtree matches!
+      return;  // Entire subtree matches!
     }
     if (a->is_leaf() && b->is_leaf()) {
       if (a->key == b->key) {
@@ -139,7 +139,7 @@ private:
     diff_nodes(a->right.get(), b->right.get(), out, compared);
   }
 
-  static void collect_leaves(const Node *node, std::vector<std::string> &out) {
+  static void collect_leaves(const Node* node, std::vector<std::string>& out) {
     if (node == nullptr) {
       return;
     }

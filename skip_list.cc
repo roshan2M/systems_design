@@ -18,14 +18,14 @@ int main() {
   sl["erin"] = 50;
   sl["bob"] = 20;
   sl["cam"] = 30;
-  sl["bob"] = 25; // Overwrite existing key
+  sl["bob"] = 25;  // Overwrite existing key
 
   assert(sl.size() == 5);
   assert(sl.find("bob") != sl.end() && sl.find("bob")->second == 25);
   assert(sl.find("missing") == sl.end());
 
   std::vector<std::string> keys_in_order;
-  for (const auto &[k, _] : sl) {
+  for (const auto& [k, _] : sl) {
     keys_in_order.push_back(k);
   }
   const std::vector<std::string> expected = {"alice", "bob", "cam", "dave",
@@ -60,7 +60,6 @@ int main() {
             << avg_hops << " hops/lookup (vs ~" << (N / 2)
             << " in a plain sorted linked list!)\n";
 
-  assert(avg_hops < 40.0); // Expected ~log2(10000) = ~13-15 forward hops
+  assert(avg_hops < 40.0);  // Expected ~log2(10000) = ~13-15 forward hops
   return 0;
 }
-

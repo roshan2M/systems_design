@@ -54,7 +54,6 @@ int main() {
             << "  Nodes compared: " << compared << " (vs " << N
             << " full-table key comparisons!)\n";
 
-  assert(compared < 50); // ~2 * 2 * log2(1024) ≈ 40 nodes max
+  assert(compared < 50);  // ~2 * 2 * log2(1024) ≈ 40 nodes max
   return 0;
 }
-

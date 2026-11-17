@@ -27,27 +27,27 @@
 // ============================================================================
 
 class VectorClock {
-public:
+ public:
   enum class Ordering { Equal, Before, After, Concurrent };
 
   // Increment this node's logical counter on a local write/event.
-  void tick(const std::string &node_id) { ++clocks_[node_id]; }
+  void tick(const std::string& node_id) { ++clocks_[node_id]; }
 
   // Element-wise maximum merge with another vector clock.
-  void merge(const VectorClock &other) {
-    for (const auto &[node, count] : other.clocks_) {
+  void merge(const VectorClock& other) {
+    for (const auto& [node, count] : other.clocks_) {
       clocks_[node] = std::max(clocks_[node], count);
     }
   }
 
-  static VectorClock merged(const VectorClock &a, const VectorClock &b) {
+  static VectorClock merged(const VectorClock& a, const VectorClock& b) {
     VectorClock out = a;
     out.merge(b);
     return out;
   }
 
   // Determines causal relationship of `this` relative to `other`.
-  Ordering compare(const VectorClock &other) const {
+  Ordering compare(const VectorClock& other) const {
     bool this_less = false;
     bool other_less = false;
 
@@ -88,7 +88,7 @@ public:
     return this_less ? Ordering::Before : Ordering::After;
   }
 
-  std::uint64_t get(const std::string &node_id) const {
+  std::uint64_t get(const std::string& node_id) const {
     auto it = clocks_.find(node_id);
     return (it != clocks_.end()) ? it->second : 0;
   }
@@ -97,7 +97,7 @@ public:
     std::ostringstream oss;
     oss << "{";
     bool first = true;
-    for (const auto &[node, count] : clocks_) {
+    for (const auto& [node, count] : clocks_) {
       if (!first) {
         oss << ", ";
       }
@@ -108,6 +108,6 @@ public:
     return oss.str();
   }
 
-private:
+ private:
   std::map<std::string, std::uint64_t> clocks_;
 };

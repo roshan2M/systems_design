@@ -37,43 +37,45 @@
 //      to an SSTable on disk is a simple linear walk.
 // ============================================================================
 
-template <typename K, typename V> class SkipList {
-public:
-  static constexpr std::size_t kMaxLevel = 16; // Good for ~65k+ keys at p = 0.5
+template <typename K, typename V>
+class SkipList {
+ public:
+  static constexpr std::size_t kMaxLevel =
+      16;  // Good for ~65k+ keys at p = 0.5
   using value_type = std::pair<const K, V>;
 
-private:
+ private:
   struct Node {
     value_type kv;
     std::size_t height;
-    std::array<Node *, kMaxLevel> next{};
+    std::array<Node*, kMaxLevel> next{};
 
     template <typename KeyArg, typename ValArg>
-    Node(KeyArg &&k, ValArg &&v, std::size_t h)
+    Node(KeyArg&& k, ValArg&& v, std::size_t h)
         : kv(std::forward<KeyArg>(k), std::forward<ValArg>(v)), height(h) {}
   };
 
-  template <bool IsConst> class Iter {
-  public:
+  template <bool IsConst>
+  class Iter {
+   public:
     using iterator_category = std::forward_iterator_tag;
     using difference_type = std::ptrdiff_t;
     using value_type = SkipList::value_type;
-    using pointer =
-        std::conditional_t<IsConst, const value_type *, value_type *>;
+    using pointer = std::conditional_t<IsConst, const value_type*, value_type*>;
     using reference =
-        std::conditional_t<IsConst, const value_type &, value_type &>;
-    using NodePtr = std::conditional_t<IsConst, const Node *, Node *>;
+        std::conditional_t<IsConst, const value_type&, value_type&>;
+    using NodePtr = std::conditional_t<IsConst, const Node*, Node*>;
 
     explicit Iter(NodePtr node = nullptr) : node_(node) {}
 
     // Allow implicit conversion from non-const iterator to const_iterator.
     template <bool WasConst, typename = std::enable_if_t<IsConst && !WasConst>>
-    Iter(const Iter<WasConst> &other) : node_(other.node_) {}
+    Iter(const Iter<WasConst>& other) : node_(other.node_) {}
 
     reference operator*() const { return node_->kv; }
     pointer operator->() const { return &node_->kv; }
 
-    Iter &operator++() {
+    Iter& operator++() {
       node_ = node_->next[0];
       return *this;
     }
@@ -83,19 +85,19 @@ private:
       return tmp;
     }
 
-    friend bool operator==(const Iter &a, const Iter &b) {
+    friend bool operator==(const Iter& a, const Iter& b) {
       return a.node_ == b.node_;
     }
-    friend bool operator!=(const Iter &a, const Iter &b) {
+    friend bool operator!=(const Iter& a, const Iter& b) {
       return a.node_ != b.node_;
     }
 
-  private:
+   private:
     friend class SkipList;
     NodePtr node_;
   };
 
-public:
+ public:
   using iterator = Iter<false>;
   using const_iterator = Iter<true>;
 
@@ -107,13 +109,13 @@ public:
     delete head_;
   }
 
-  SkipList(const SkipList &other) : SkipList() {
-    for (const auto &[k, v] : other) {
+  SkipList(const SkipList& other) : SkipList() {
+    for (const auto& [k, v] : other) {
       insert_or_assign(k, v);
     }
   }
 
-  SkipList &operator=(const SkipList &other) {
+  SkipList& operator=(const SkipList& other) {
     if (this != &other) {
       SkipList copy(other);
       swap(copy);
@@ -121,9 +123,9 @@ public:
     return *this;
   }
 
-  SkipList(SkipList &&other) noexcept : SkipList() { swap(other); }
+  SkipList(SkipList&& other) noexcept : SkipList() { swap(other); }
 
-  SkipList &operator=(SkipList &&other) noexcept {
+  SkipList& operator=(SkipList&& other) noexcept {
     if (this != &other) {
       clear();
       swap(other);
@@ -131,7 +133,7 @@ public:
     return *this;
   }
 
-  void swap(SkipList &other) noexcept {
+  void swap(SkipList& other) noexcept {
     std::swap(head_, other.head_);
     std::swap(height_, other.height_);
     std::swap(size_, other.size_);
@@ -140,9 +142,9 @@ public:
   }
 
   // Insert `key -> value`, or overwrite the existing value if `key` exists.
-  void insert_or_assign(const K &key, V value) {
-    std::array<Node *, kMaxLevel> update{};
-    Node *curr = find_predecessors(key, update);
+  void insert_or_assign(const K& key, V value) {
+    std::array<Node*, kMaxLevel> update{};
+    Node* curr = find_predecessors(key, update);
 
     if (curr != nullptr && curr->kv.first == key) {
       curr->kv.second = std::move(value);
@@ -157,7 +159,7 @@ public:
       height_ = node_height;
     }
 
-    Node *fresh = new Node(key, std::move(value), node_height);
+    Node* fresh = new Node(key, std::move(value), node_height);
     for (std::size_t lvl = 0; lvl < node_height; ++lvl) {
       fresh->next[lvl] = update[lvl]->next[lvl];
       update[lvl]->next[lvl] = fresh;
@@ -166,9 +168,9 @@ public:
   }
 
   // Subscript access matching std::map::operator[].
-  V &operator[](const K &key) {
-    std::array<Node *, kMaxLevel> update{};
-    Node *curr = find_predecessors(key, update);
+  V& operator[](const K& key) {
+    std::array<Node*, kMaxLevel> update{};
+    Node* curr = find_predecessors(key, update);
     if (curr != nullptr && curr->kv.first == key) {
       return curr->kv.second;
     }
@@ -181,7 +183,7 @@ public:
       height_ = node_height;
     }
 
-    Node *fresh = new Node(key, V{}, node_height);
+    Node* fresh = new Node(key, V{}, node_height);
     for (std::size_t lvl = 0; lvl < node_height; ++lvl) {
       fresh->next[lvl] = update[lvl]->next[lvl];
       update[lvl]->next[lvl] = fresh;
@@ -190,19 +192,19 @@ public:
     return fresh->kv.second;
   }
 
-  iterator find(const K &key) {
-    Node *node = find_node(key);
+  iterator find(const K& key) {
+    Node* node = find_node(key);
     return iterator(node);
   }
 
-  const_iterator find(const K &key) const {
-    const Node *node = find_node(key);
+  const_iterator find(const K& key) const {
+    const Node* node = find_node(key);
     return const_iterator(node);
   }
 
-  bool erase(const K &key) {
-    std::array<Node *, kMaxLevel> update{};
-    Node *target = find_predecessors(key, update);
+  bool erase(const K& key) {
+    std::array<Node*, kMaxLevel> update{};
+    Node* target = find_predecessors(key, update);
     if (target == nullptr || target->kv.first != key) {
       return false;
     }
@@ -222,9 +224,9 @@ public:
   }
 
   void clear() {
-    Node *curr = head_->next[0];
+    Node* curr = head_->next[0];
     while (curr != nullptr) {
-      Node *next = curr->next[0];
+      Node* next = curr->next[0];
       delete curr;
       curr = next;
     }
@@ -243,8 +245,8 @@ public:
   const_iterator begin() const { return const_iterator(head_->next[0]); }
   const_iterator end() const { return const_iterator(nullptr); }
 
-private:
-  Node *head_;
+ private:
+  Node* head_;
   std::size_t height_ = 1;
   std::size_t size_ = 0;
   std::mt19937_64 rng_;
@@ -263,9 +265,9 @@ private:
 
   // Walk from top level down to level 0, recording the rightmost node < `key`
   // at each level in `update`. Returns the candidate node >= `key` at level 0.
-  Node *find_predecessors(const K &key,
-                          std::array<Node *, kMaxLevel> &update) const {
-    Node *curr = head_;
+  Node* find_predecessors(const K& key,
+                          std::array<Node*, kMaxLevel>& update) const {
+    Node* curr = head_;
     std::size_t hops = 0;
     for (std::size_t lvl = height_; lvl-- > 0;) {
       while (curr->next[lvl] != nullptr && curr->next[lvl]->kv.first < key) {
@@ -278,9 +280,9 @@ private:
     return curr->next[0];
   }
 
-  Node *find_node(const K &key) const {
-    std::array<Node *, kMaxLevel> unused{};
-    Node *candidate = find_predecessors(key, unused);
+  Node* find_node(const K& key) const {
+    std::array<Node*, kMaxLevel> unused{};
+    Node* candidate = find_predecessors(key, unused);
     if (candidate != nullptr && candidate->kv.first == key) {
       return candidate;
     }

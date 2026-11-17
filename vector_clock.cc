@@ -4,16 +4,16 @@
 #include <iostream>
 #include <string>
 
-static const char *to_str(VectorClock::Ordering ord) {
+static const char* to_str(VectorClock::Ordering ord) {
   switch (ord) {
-  case VectorClock::Ordering::Equal:
-    return "Equal";
-  case VectorClock::Ordering::Before:
-    return "Before (ancestor)";
-  case VectorClock::Ordering::After:
-    return "After (descendant)";
-  case VectorClock::Ordering::Concurrent:
-    return "Concurrent (CONFLICT!)";
+    case VectorClock::Ordering::Equal:
+      return "Equal";
+    case VectorClock::Ordering::Before:
+      return "Before (ancestor)";
+    case VectorClock::Ordering::After:
+      return "After (descendant)";
+    case VectorClock::Ordering::Concurrent:
+      return "Concurrent (CONFLICT!)";
   }
   return "";
 }
@@ -24,10 +24,10 @@ static const char *to_str(VectorClock::Ordering ord) {
 int main() {
   // 1. Causal chain: Node A writes v1, replicates to Node B, which writes v2.
   VectorClock v1;
-  v1.tick("A"); // {A:1}
+  v1.tick("A");  // {A:1}
 
   VectorClock v2 = v1;
-  v2.tick("B"); // {A:1, B:1}
+  v2.tick("B");  // {A:1, B:1}
 
   assert(v1.compare(v2) == VectorClock::Ordering::Before);
   assert(v2.compare(v1) == VectorClock::Ordering::After);
@@ -41,10 +41,10 @@ int main() {
   // 2. Network partition: two clients concurrently update v2 on different
   //    coordinator nodes (A and C) without seeing each other's writes.
   VectorClock branch_a = v2;
-  branch_a.tick("A"); // {A:2, B:1}
+  branch_a.tick("A");  // {A:2, B:1}
 
   VectorClock branch_c = v2;
-  branch_c.tick("C"); // {A:1, B:1, C:1}
+  branch_c.tick("C");  // {A:1, B:1, C:1}
 
   assert(branch_a.compare(branch_c) == VectorClock::Ordering::Concurrent);
   assert(branch_c.compare(branch_a) == VectorClock::Ordering::Concurrent);
@@ -58,7 +58,7 @@ int main() {
   // 3. Conflict resolution: client reads both siblings, merges their clocks,
   //    and writes the resolved value through coordinator B.
   VectorClock resolved = VectorClock::merged(branch_a, branch_c);
-  resolved.tick("B"); // {A:2, B:2, C:1}
+  resolved.tick("B");  // {A:2, B:2, C:1}
 
   assert(resolved.compare(branch_a) == VectorClock::Ordering::After);
   assert(resolved.compare(branch_c) == VectorClock::Ordering::After);
@@ -72,4 +72,3 @@ int main() {
 
   return 0;
 }
-
